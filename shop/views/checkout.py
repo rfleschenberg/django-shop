@@ -9,6 +9,7 @@ from cms.plugin_pool import plugin_pool
 from shop.cascade.plugin_base import DialogFormPluginBase
 from shop.rest.serializers import CheckoutSerializer
 from shop.modifiers.pool import cart_modifiers_pool
+from shop.forms.checkout import ShippingAddressForm, BillingAddressForm
 from .cart import BaseViewSet
 
 
@@ -22,6 +23,9 @@ class CheckoutViewSet(BaseViewSet):
         self.dialog_forms = []
         for p in plugin_pool.get_all_plugins():
             if issubclass(p, DialogFormPluginBase):
+                if import_string(p.form_class) is ShippingAddressForm \
+                        or import_string(p.form_class) is BillingAddressForm:
+                    continue
                 self.dialog_forms.append(import_string(p.form_class))
 
     @list_route(methods=['post'], url_path='upload')
